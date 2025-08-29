@@ -21,7 +21,7 @@ public class HealthController {
         healthStatus.put("application", "Webhook App");
         healthStatus.put("version", "1.0.0");
         healthStatus.put("student", "Deepak");
-        healthStatus.put("rollNumber", "RA2111027010152");
+        healthStatus.put("regNumber", "22BCT0243");
         
         return ResponseEntity.ok(healthStatus);
     }
@@ -32,7 +32,7 @@ public class HealthController {
         appInfo.put("name", "Spring Boot Webhook Application");
         appInfo.put("description", "Bajaj Assignment - Webhook Processing with SQL Solution");
         appInfo.put("developer", "Deepak");
-        appInfo.put("rollNumber", "RA2111027010152");
+        appInfo.put("regNumber", "22BCT0243");
         appInfo.put("framework", "Spring Boot 3.2.0");
         appInfo.put("javaVersion", System.getProperty("java.version"));
         

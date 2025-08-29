@@ -4,7 +4,7 @@ This is a Spring Boot application that implements the BFHL assignment requiremen
 
 ## Student Information
 - **Name**: Deepak
-- **Registration Number**: RA2111027010152
+- **Registration Number**: 22BCT0243
 - **Email**: deepak@example.com
 
 ## Assignment Overview
@@ -33,60 +33,56 @@ This application demonstrates the complete BFHL assignment workflow:
 POST https://bfhldevapigw.healthrx.co.in/hiring/generateWebhook/JAVA
 Body: {
     "name": "Deepak",
-    "regNo": "RA2111027010152", 
+    "regNo": "22BCT0243", 
     "email": "deepak@example.com"
 }
 ```
 
 ### Step 2: Question Assignment
-- RegNo "RA2111027010152" ends with **52** (Even number)
-- **Assigned Question**: Question 2
+- RegNo "22BCT0243" ends with **43** (Odd number)
+- **Assigned Question**: Question 1
 
-### Step 3: Question 2 Problem Statement
-**Calculate the number of employees who are younger than each employee, grouped by their respective departments.**
+### Step 3: Question 1 Problem Statement
+**Find the highest salary that was credited to an employee, but only for transactions that were not made on the 1st day of any month. Along with the salary, extract the employee data like name, age and department.**
 
 **Output Format:**
-1. `EMP_ID`: The ID of the employee
-2. `FIRST_NAME`: The first name of the employee  
-3. `LAST_NAME`: The last name of the employee
-4. `DEPARTMENT_NAME`: The name of the department
-5. `YOUNGER_EMPLOYEES_COUNT`: Number of younger employees in same department
-
-**Order**: Employee ID in descending order
+1. `SALARY`: The highest salary credited not on the 1st day of the month
+2. `NAME`: Combined first name and last name (format: "First Last")
+3. `AGE`: The age of the employee who received that salary
+4. `DEPARTMENT_NAME`: Name of the department
 
 ### Step 4: Solution Submission
 ```
 POST https://bfhldevapigw.healthrx.co.in/hiring/testWebhook/JAVA
 Headers: Authorization: <accessToken>
 Body: {
-    "finalQuery": "SELECT e1.EMP_ID, e1.FIRST_NAME, e1.LAST_NAME, d.DEPARTMENT_NAME, (SELECT COUNT(*) FROM EMPLOYEE e2 WHERE e2.DEPARTMENT = e1.DEPARTMENT AND e2.DOB > e1.DOB) AS YOUNGER_EMPLOYEES_COUNT FROM EMPLOYEE e1 INNER JOIN DEPARTMENT d ON e1.DEPARTMENT = d.DEPARTMENT_ID ORDER BY e1.EMP_ID DESC"
+    "finalQuery": "SELECT p.AMOUNT AS SALARY, CONCAT(e.FIRST_NAME, ' ', e.LAST_NAME) AS NAME, TIMESTAMPDIFF(YEAR, e.DOB, CURDATE()) AS AGE, d.DEPARTMENT_NAME FROM PAYMENTS p INNER JOIN EMPLOYEE e ON p.EMP_ID = e.EMP_ID INNER JOIN DEPARTMENT d ON e.DEPARTMENT = d.DEPARTMENT_ID WHERE DAY(p.PAYMENT_TIME) != 1 ORDER BY p.AMOUNT DESC LIMIT 1"
 }
 ```
 
-## SQL Solution (Question 2)
+## SQL Solution (Question 1)
 
 ```sql
 SELECT 
-    e1.EMP_ID,
-    e1.FIRST_NAME,
-    e1.LAST_NAME,
-    d.DEPARTMENT_NAME,
-    (
-        SELECT COUNT(*)
-        FROM EMPLOYEE e2
-        WHERE e2.DEPARTMENT = e1.DEPARTMENT
-        AND e2.DOB > e1.DOB
-    ) AS YOUNGER_EMPLOYEES_COUNT
-FROM EMPLOYEE e1
-INNER JOIN DEPARTMENT d ON e1.DEPARTMENT = d.DEPARTMENT_ID
-ORDER BY e1.EMP_ID DESC
+    p.AMOUNT AS SALARY,
+    CONCAT(e.FIRST_NAME, ' ', e.LAST_NAME) AS NAME,
+    TIMESTAMPDIFF(YEAR, e.DOB, CURDATE()) AS AGE,
+    d.DEPARTMENT_NAME
+FROM PAYMENTS p
+INNER JOIN EMPLOYEE e ON p.EMP_ID = e.EMP_ID
+INNER JOIN DEPARTMENT d ON e.DEPARTMENT = d.DEPARTMENT_ID
+WHERE DAY(p.PAYMENT_TIME) != 1
+ORDER BY p.AMOUNT DESC
+LIMIT 1
 ```
 
 **Solution Explanation:**
-1. **Main Query**: Selects all employees with their department information
-2. **Subquery**: Counts employees in same department with DOB > current employee's DOB (younger)
-3. **JOIN**: Links employee table with department table for department names
-4. **ORDER BY**: Results ordered by EMP_ID in descending order
+1. **INNER JOINs**: Links PAYMENTS → EMPLOYEE → DEPARTMENT tables
+2. **WHERE Clause**: Filters out payments made on 1st day of any month using `DAY(p.PAYMENT_TIME) != 1`
+3. **CONCAT**: Combines first and last name into single NAME field
+4. **TIMESTAMPDIFF**: Calculates age in years from DOB to current date
+5. **ORDER BY**: Sorts by amount in descending order to get highest salary
+6. **LIMIT 1**: Returns only the highest salary record
 
 ## Project Structure
 

@@ -17,7 +17,7 @@ public class WebhookService {
     
     // Student information
     private static final String STUDENT_NAME = "Deepak";
-    private static final String REG_NO = "RA2111027010152"; // Last two digits: 52 (Even)
+    private static final String REG_NO = "22BCT0243"; // Last two digits: 43 (Odd)
     private static final String EMAIL = "deepak@example.com";
     
     private final RestTemplate restTemplate;
@@ -38,13 +38,13 @@ public class WebhookService {
                 logger.info("Webhook generated successfully. URL: {}", webhookResponse.getWebhook());
                 logger.info("Access token received: {}", webhookResponse.getAccessToken() != null ? "Yes" : "No");
                 
-                // Step 2: Determine question based on regNo (last two digits: 52 = Even)
-                // Even regNo → Question 2
-                logger.info("RegNo ends with 52 (Even) → Using Question 2");
+                // Step 2: Determine question based on regNo (last two digits: 43 = Odd)
+                // Odd regNo → Question 1
+                logger.info("RegNo ends with 43 (Odd) → Using Question 1");
                 
-                // Step 3: Solve SQL problem for Question 2
-                String sqlSolution = sqlSolverService.solveQuestion2();
-                logger.info("SQL solution generated for Question 2");
+                // Step 3: Solve SQL problem for Question 1
+                String sqlSolution = sqlSolverService.solveQuestion1();
+                logger.info("SQL solution generated for Question 1");
                 
                 // Step 4: Send solution to webhook URL using JWT
                 sendSolutionToWebhook(webhookResponse.getWebhook(), webhookResponse.getAccessToken(), sqlSolution);
