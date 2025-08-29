@@ -12,6 +12,7 @@
 
 # Package Files #
 *.jar
+!target/webhook-app.jar
 *.war
 *.nar
 *.ear
@@ -29,6 +30,7 @@ hs_err_pid*
 
 # Maven
 target/
+!target/webhook-app.jar
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
