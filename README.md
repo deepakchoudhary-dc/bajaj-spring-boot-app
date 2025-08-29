@@ -1,74 +1,105 @@
-# Spring Boot Webhook Application - Bajaj Assignment
+# Spring Boot Webhook Application - BFHL Assignment
 
-This is a Spring Boot application that implements a webhook processing system with SQL solution generation.
+This is a Spring Boot application that implements the BFHL assignment requirements for webhook processing with SQL problem solving.
 
 ## Student Information
 - **Name**: Deepak
-- **Roll Number**: RA2111027010152
+- **Registration Number**: RA2111027010152
+- **Email**: deepak@example.com
 
-## Application Overview
+## Assignment Overview
 
-This application demonstrates:
-1. **Webhook Generation**: Sends POST request to generate a webhook
-2. **SQL Problem Solving**: Generates complex SQL queries with analytics
-3. **JWT Authentication**: Uses JWT tokens for webhook communication
-4. **RESTful APIs**: Provides health and info endpoints
+This application demonstrates the complete BFHL assignment workflow:
+1. **Webhook Generation**: Sends POST request to BFHL API to generate webhook
+2. **Question Assignment**: Based on RegNo last two digits (52 = Even → Question 2)
+3. **SQL Problem Solving**: Solves the assigned SQL question
+4. **Solution Submission**: Submits final SQL query using JWT authentication
 
 ## Technical Stack
 
 - **Framework**: Spring Boot 3.2.0
 - **Java Version**: 17
 - **Build Tool**: Maven 3.9.5
+- **HTTP Client**: RestTemplate
 - **Dependencies**:
   - Spring Boot Starter Web
   - Spring Boot Starter Test
-  - RestTemplate for HTTP communication
   - SLF4J for logging
+
+## BFHL Assignment Requirements
+
+### Step 1: Generate Webhook
+```
+POST https://bfhldevapigw.healthrx.co.in/hiring/generateWebhook/JAVA
+Body: {
+    "name": "Deepak",
+    "regNo": "RA2111027010152", 
+    "email": "deepak@example.com"
+}
+```
+
+### Step 2: Question Assignment
+- RegNo "RA2111027010152" ends with **52** (Even number)
+- **Assigned Question**: Question 2
+
+### Step 3: Question 2 Problem Statement
+**Calculate the number of employees who are younger than each employee, grouped by their respective departments.**
+
+**Output Format:**
+1. `EMP_ID`: The ID of the employee
+2. `FIRST_NAME`: The first name of the employee  
+3. `LAST_NAME`: The last name of the employee
+4. `DEPARTMENT_NAME`: The name of the department
+5. `YOUNGER_EMPLOYEES_COUNT`: Number of younger employees in same department
+
+**Order**: Employee ID in descending order
+
+### Step 4: Solution Submission
+```
+POST https://bfhldevapigw.healthrx.co.in/hiring/testWebhook/JAVA
+Headers: Authorization: <accessToken>
+Body: {
+    "finalQuery": "SELECT e1.EMP_ID, e1.FIRST_NAME, e1.LAST_NAME, d.DEPARTMENT_NAME, (SELECT COUNT(*) FROM EMPLOYEE e2 WHERE e2.DEPARTMENT = e1.DEPARTMENT AND e2.DOB > e1.DOB) AS YOUNGER_EMPLOYEES_COUNT FROM EMPLOYEE e1 INNER JOIN DEPARTMENT d ON e1.DEPARTMENT = d.DEPARTMENT_ID ORDER BY e1.EMP_ID DESC"
+}
+```
+
+## SQL Solution (Question 2)
+
+```sql
+SELECT 
+    e1.EMP_ID,
+    e1.FIRST_NAME,
+    e1.LAST_NAME,
+    d.DEPARTMENT_NAME,
+    (
+        SELECT COUNT(*)
+        FROM EMPLOYEE e2
+        WHERE e2.DEPARTMENT = e1.DEPARTMENT
+        AND e2.DOB > e1.DOB
+    ) AS YOUNGER_EMPLOYEES_COUNT
+FROM EMPLOYEE e1
+INNER JOIN DEPARTMENT d ON e1.DEPARTMENT = d.DEPARTMENT_ID
+ORDER BY e1.EMP_ID DESC
+```
+
+**Solution Explanation:**
+1. **Main Query**: Selects all employees with their department information
+2. **Subquery**: Counts employees in same department with DOB > current employee's DOB (younger)
+3. **JOIN**: Links employee table with department table for department names
+4. **ORDER BY**: Results ordered by EMP_ID in descending order
 
 ## Project Structure
 
 ```
-src/
-├── main/
-│   ├── java/com/example/webhookapp/
-│   │   ├── WebhookAppApplication.java          # Main application class
-│   │   ├── config/
-│   │   │   └── StartupRunner.java              # Application startup logic
-│   │   ├── controller/
-│   │   │   └── HealthController.java           # Health and info endpoints
-│   │   ├── model/
-│   │   │   ├── WebhookResponse.java            # Webhook response model
-│   │   │   └── SolutionRequest.java            # Solution request model
-│   │   └── service/
-│   │       ├── WebhookService.java             # Main webhook processing
-│   │       └── SqlSolverService.java           # SQL solution generator
-│   └── resources/
-│       └── application.properties              # Application configuration
-└── target/
-    └── webhook-app.jar                         # Executable JAR file
+src/main/java/com/example/webhookapp/
+├── WebhookAppApplication.java          # Main Spring Boot application
+├── config/StartupRunner.java           # Triggers workflow on startup
+├── service/
+│   ├── WebhookService.java            # BFHL API integration
+│   └── SqlSolverService.java          # Question 2 SQL solution
+├── model/WebhookResponse.java         # API response model
+└── controller/HealthController.java   # Health endpoints
 ```
-
-## Key Features
-
-### 1. Webhook Processing Flow
-- Sends POST request to webhook endpoint with student information
-- Receives webhook URL and JWT token
-- Processes the response and extracts necessary data
-
-### 2. SQL Solution Generation
-The application generates comprehensive SQL queries featuring:
-- **Common Table Expressions (CTEs)**: ProductSales, CustomerAnalytics, TopPerformingProducts
-- **Window Functions**: RANK(), DENSE_RANK(), PERCENT_RANK()
-- **Aggregate Functions**: SUM(), COUNT(), AVG()
-- **JOIN Operations**: INNER JOIN, LEFT JOIN
-- **Subqueries**: Correlated and non-correlated
-- **Conditional Logic**: CASE statements
-- **Date Functions**: DATE_SUB(), CURRENT_DATE
-- **Performance Analytics**: Revenue ranking and percentile calculations
-
-### 3. RESTful Endpoints
-- `GET /api/health` - Application health status
-- `GET /api/info` - Application information and metadata
 
 ## How to Run
 

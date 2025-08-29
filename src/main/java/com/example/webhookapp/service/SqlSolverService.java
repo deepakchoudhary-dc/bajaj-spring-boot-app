@@ -9,82 +9,67 @@ public class SqlSolverService {
     
     private static final Logger logger = LoggerFactory.getLogger(SqlSolverService.class);
     
-    public String solveSqlProblem(String problemData) {
-        logger.info("Solving SQL problem with data: {}", problemData);
+    /**
+     * Solves Question 2: Calculate the number of employees who are younger than each employee,
+     * grouped by their respective departments.
+     * 
+     * RegNo "RA2111027010152" ends with 52 (Even) → Question 2
+     */
+    public String solveQuestion2() {
+        logger.info("Solving SQL Question 2: Count younger employees in same department");
         
-        // This is a comprehensive SQL solution that demonstrates various SQL concepts
         String sqlSolution = """
-            WITH ProductSales AS (
-                SELECT 
-                    p.product_id,
-                    p.product_name,
-                    p.category,
-                    p.price,
-                    SUM(o.quantity) as total_quantity_sold,
-                    SUM(o.quantity * p.price) as total_revenue,
-                    COUNT(DISTINCT o.customer_id) as unique_customers
-                FROM products p
-                INNER JOIN orders o ON p.product_id = o.product_id
-                WHERE o.order_date >= DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR)
-                GROUP BY p.product_id, p.product_name, p.category, p.price
-            ),
-            CustomerAnalytics AS (
-                SELECT 
-                    c.customer_id,
-                    c.customer_name,
-                    c.region,
-                    COUNT(o.order_id) as total_orders,
-                    SUM(o.quantity * p.price) as customer_lifetime_value,
-                    AVG(o.quantity * p.price) as avg_order_value,
-                    RANK() OVER (PARTITION BY c.region ORDER BY SUM(o.quantity * p.price) DESC) as customer_rank_in_region
-                FROM customers c
-                LEFT JOIN orders o ON c.customer_id = o.customer_id
-                LEFT JOIN products p ON o.product_id = p.product_id
-                GROUP BY c.customer_id, c.customer_name, c.region
-            ),
-            TopPerformingProducts AS (
-                SELECT 
-                    ps.product_id,
-                    ps.product_name,
-                    ps.category,
-                    ps.total_revenue,
-                    ps.total_quantity_sold,
-                    ps.unique_customers,
-                    DENSE_RANK() OVER (ORDER BY ps.total_revenue DESC) as revenue_rank,
-                    PERCENT_RANK() OVER (ORDER BY ps.total_revenue) as revenue_percentile
-                FROM ProductSales ps
-                WHERE ps.total_revenue > (
-                    SELECT AVG(total_revenue) * 1.5 
-                    FROM ProductSales
-                )
-            )
             SELECT 
-                tpp.product_name,
-                tpp.category,
-                tpp.total_revenue,
-                tpp.total_quantity_sold,
-                tpp.unique_customers,
-                tpp.revenue_rank,
-                ROUND(tpp.revenue_percentile * 100, 2) as revenue_percentile,
-                CASE 
-                    WHEN tpp.revenue_rank <= 5 THEN 'Top Performer'
-                    WHEN tpp.revenue_rank <= 20 THEN 'Good Performer'
-                    ELSE 'Average Performer'
-                END as performance_category,
-                ca.customer_name as top_customer_in_region,
-                ca.customer_lifetime_value as top_customer_value
-            FROM TopPerformingProducts tpp
-            LEFT JOIN CustomerAnalytics ca ON ca.customer_rank_in_region = 1 
-                AND ca.customer_id IN (
-                    SELECT DISTINCT o.customer_id 
-                    FROM orders o 
-                    WHERE o.product_id = tpp.product_id
-                )
-            ORDER BY tpp.total_revenue DESC, tpp.total_quantity_sold DESC
-            LIMIT 50;
+                e1.EMP_ID,
+                e1.FIRST_NAME,
+                e1.LAST_NAME,
+                d.DEPARTMENT_NAME,
+                (
+                    SELECT COUNT(*)
+                    FROM EMPLOYEE e2
+                    WHERE e2.DEPARTMENT = e1.DEPARTMENT
+                    AND e2.DOB > e1.DOB
+                ) AS YOUNGER_EMPLOYEES_COUNT
+            FROM EMPLOYEE e1
+            INNER JOIN DEPARTMENT d ON e1.DEPARTMENT = d.DEPARTMENT_ID
+            ORDER BY e1.EMP_ID DESC
             """;
         
-        logger.info("Generated comprehensive SQL solution with advanced analytics");
+        logger.info("Generated SQL solution for Question 2 (Even RegNo)");
         return sqlSolution.trim();
+    }
+    
+    /**
+     * Solves Question 1: Find highest salary not on 1st day of month
+     * (This would be used for odd RegNo)
+     */
+    public String solveQuestion1() {
+        logger.info("Solving SQL Question 1: Highest salary not on 1st day of month");
+        
+        String sqlSolution = """
+            SELECT 
+                p.AMOUNT AS SALARY,
+                CONCAT(e.FIRST_NAME, ' ', e.LAST_NAME) AS NAME,
+                TIMESTAMPDIFF(YEAR, e.DOB, CURDATE()) AS AGE,
+                d.DEPARTMENT_NAME
+            FROM PAYMENTS p
+            INNER JOIN EMPLOYEE e ON p.EMP_ID = e.EMP_ID
+            INNER JOIN DEPARTMENT d ON e.DEPARTMENT = d.DEPARTMENT_ID
+            WHERE DAY(p.PAYMENT_TIME) != 1
+            ORDER BY p.AMOUNT DESC
+            LIMIT 1
+            """;
+        
+        logger.info("Generated SQL solution for Question 1 (Odd RegNo)");
+        return sqlSolution.trim();
+    }
+    
+    /**
+     * Legacy method for backward compatibility
+     */
+    @Deprecated
+    public String solveSqlProblem(String problemData) {
+        logger.info("Using legacy method - delegating to Question 2 solution");
+        return solveQuestion2();
     }
 }

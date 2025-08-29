@@ -4,14 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class WebhookResponse {
     
-    @JsonProperty("webhook_url")
-    private String webhookUrl;
+    @JsonProperty("webhook")
+    private String webhook;
     
-    @JsonProperty("token")
-    private String token;
-    
-    @JsonProperty("data")
-    private String data;
+    @JsonProperty("accessToken")
+    private String accessToken;
     
     @JsonProperty("success")
     private boolean success;
@@ -21,28 +18,20 @@ public class WebhookResponse {
     
     public WebhookResponse() {}
     
-    public String getWebhookUrl() {
-        return webhookUrl;
+    public String getWebhook() {
+        return webhook;
     }
     
-    public void setWebhookUrl(String webhookUrl) {
-        this.webhookUrl = webhookUrl;
+    public void setWebhook(String webhook) {
+        this.webhook = webhook;
     }
     
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
     }
     
-    public void setToken(String token) {
-        this.token = token;
-    }
-    
-    public String getData() {
-        return data;
-    }
-    
-    public void setData(String data) {
-        this.data = data;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
     
     public boolean isSuccess() {
@@ -64,9 +53,8 @@ public class WebhookResponse {
     @Override
     public String toString() {
         return "WebhookResponse{" +
-                "webhookUrl='" + webhookUrl + '\'' +
-                ", token='" + token + '\'' +
-                ", data='" + data + '\'' +
+                "webhook='" + webhook + '\'' +
+                ", accessToken='" + (accessToken != null ? "***" + accessToken.substring(Math.max(0, accessToken.length() - 10)) : "null") + '\'' +
                 ", success=" + success +
                 ", message='" + message + '\'' +
                 '}';
