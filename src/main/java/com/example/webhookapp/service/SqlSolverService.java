@@ -13,7 +13,7 @@ public class SqlSolverService {
      * Solves Question 2: Calculate the number of employees who are younger than each employee,
      * grouped by their respective departments.
      * 
-     * RegNo "RA2111027010152" ends with 52 (Even) → Question 2
+     * RegNo "22BCT0243" ends with 43 (Odd) → Question 1
      */
     public String solveQuestion2() {
         logger.info("Solving SQL Question 2: Count younger employees in same department");
